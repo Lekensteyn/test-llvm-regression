@@ -1,0 +1,25 @@
+language: cpp
+
+dist: osx
+osx_image: xcode9.3
+
+script:
+  - mkdir out
+  - clang --driver-mode=g++ -fsanitize=address -mno-omit-leaf-frame-pointer -fno-omit-frame-pointer -fno-optimize-sibling-calls -gline-tables-only  -arch i386   -stdlib=libc++ -mmacosx-version-min=10.9 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk  -g fgets_fputs.cc -o out/fgets_fputs32
+  - clang --driver-mode=g++ -fsanitize=address -mno-omit-leaf-frame-pointer -fno-omit-frame-pointer -fno-optimize-sibling-calls -gline-tables-only  -arch x86_64 -stdlib=libc++ -mmacosx-version-min=10.9 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk  -g fgets_fputs.cc -o out/fgets_fputs64
+  - clang --driver-mode=g++ -fsanitize=address -mno-omit-leaf-frame-pointer -fno-omit-frame-pointer -fno-optimize-sibling-calls -gline-tables-only  -arch i386   -stdlib=libc++ -mmacosx-version-min=10.9 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk  -g fgets_fputs.cc -o out/fgets_fputs32-dyn -shared-libasan
+  - clang --driver-mode=g++ -fsanitize=address -mno-omit-leaf-frame-pointer -fno-omit-frame-pointer -fno-optimize-sibling-calls -gline-tables-only  -arch x86_64 -stdlib=libc++ -mmacosx-version-min=10.9 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk  -g fgets_fputs.cc -o out/fgets_fputs64-dyn -shared-libasan
+  - tar c out/ | gzip -9 | base64
+  - echo data > testdata
+  - out/fgets_fputs32 1 testdata || :
+  - out/fgets_fputs32 2 || :
+  - out/fgets_fputs32 3 || :
+  - out/fgets_fputs64 1 testdata || :
+  - out/fgets_fputs64 2 || :
+  - out/fgets_fputs64 3 || :
+  - out/fgets_fputs32-dyn 1 testdata || :
+  - out/fgets_fputs32-dyn 2 || :
+  - out/fgets_fputs32-dyn 3 || :
+  - out/fgets_fputs64-dyn 1 testdata || :
+  - out/fgets_fputs64-dyn 2 || :
+  - out/fgets_fputs64-dyn 3 || :
